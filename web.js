@@ -1,16 +1,46 @@
-var express = require('express');
-var app = express();
-app.use(express.logger());
+ var http = require('http');
+ var fs = require('fs');
+ var path = require('path');
 
-var fs = require('fs');
-var buf = fs.readFileSync('index.html');
-app.use(express.logger());
+ http.createServer(function (request, response) {
 
-app.get('/', function(request, response) {
-  response.send(buf.toString());
-});;
+    console.log('request starting for ');
+    console.log(request);
 
-var port = process.env.PORT || 5000;
-app.listen(port, function() {
-  console.log("Listening on " + port);
-});
+    var filePath = '.' + request.url;
+    if (filePath == './')
+        filePath = './index.html';
+
+    console.log(filePath);
+    var extname = path.extname(filePath);
+    var contentType = 'text/html';
+    switch (extname) {
+        case '.js':
+            contentType = 'text/javascript';
+            break;
+        case '.css':
+            contentType = 'text/css';
+            break;
+    }
+
+    path.exists(filePath, function(exists) {
+
+        if (exists) {
+            fs.readFile(filePath, function(error, content) {
+                if (error) {
+                    response.writeHead(500);
+                    response.end();
+                }
+                else {
+                    response.writeHead(200, { 'Content-Type': contentType });
+                    response.end(content, 'utf-8');
+                }
+            });
+        }
+        else {
+            response.writeHead(404);
+            response.end();
+        }
+    });
+
+ }).listen(process.env.PORT || 5000)

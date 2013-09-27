@@ -1,4 +1,4 @@
- var http = require('http');
+var http = require('http');
  var fs = require('fs');
  var path = require('path');
 
@@ -43,4 +43,4 @@
         }
     });
 
- }).listen(process.env.PORT || 5000)
+ }).listen(process.env.PORT || 8080)
